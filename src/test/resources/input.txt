@@ -1,0 +1,7 @@
+html
+	head
+		meta charset:utf8
+		title :sample
+	body
+		h1 :hello
+		input type:text name:foo value:bar
