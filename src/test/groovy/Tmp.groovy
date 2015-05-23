@@ -68,14 +68,14 @@ class Tmp {
                 lastTag.getParent().getChildren().add(tag)
 
                 // 直前のタグよりインデントが多い場合は、直前のタグの子
-            } else if (indentCount > lastIndentCount){
+            } else if (indentCount > lastIndentCount) {
                 tag.setParent(lastTag)
                 lastTag.getChildren().add(tag)
 
                 // 直前のタグよりインデントが少ない場合は、直前のタグの親を辿ってインデントが少ない物を探してその子タグとする
             } else {
                 def tmpParentTag = lastTag.getParent()
-                while(true){
+                while (true) {
                     if (indentCount > tmpParentTag.getIndentCount()) {
                         tag.setParent(tmpParentTag)
                         tmpParentTag.getChildren().add(tag)
