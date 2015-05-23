@@ -14,7 +14,8 @@ class Tmp {
         def input = new File('src/test/resources/input.txt')
 
         List<Tag> tags = new ArrayList<Tag>()
-        def lastIndentCount = 0
+        Tag lastTag
+//        def lastIndentCount = 0
 
         input.eachLine {
 //            println it
@@ -28,45 +29,32 @@ class Tmp {
             def elements = matcher[0][2].split(/ /, 2)
             tag.name = elements[0]
 
-            if (tags.size() > 0) {
-                lastIndentCount = tags.get(tags.size() - 1).indentCount
-            }
-
             // 属性を持たない場合
             if (elements.size() == 1) {
                 // インデントが直前より多かったら子要素 または 直前の要素が子要素でそれと同じインデントだったらこちらも子要素
-                if (indentCount > lastIndentCount) {
-//                if (indentCount > lastIndentCount || (tmpIndentCount == lastIndentCount)) {
-
-                    def lastRootTag = tags.get(tags.size() - 1)
-                    if (indentCount - 1 == lastRootTag.indentCount) {
-                        lastRootTag.children.add(tag)
+                if (lastTag != null) {
+                    if (indentCount == lastTag.getIndentCount()) {
+                        tag.setParent(lastTag.getParent())
+                        lastTag.getParent().getChildren().add(tag)
+                    } else if (indentCount > lastTag.getIndentCount()){
+                        tag.setParent(lastTag)
+                        lastTag.getChildren().add(tag)
                     } else {
-                        def t = lastRootTag
-                        while (true) {
-                            def t2 = t.children.get(t.children.size() - 1)
-
-                            if (indentCount - 1 == t2.indentCount) {
-                                t2.children.add(tag)
+                        // 直前のタグよりインデントが少ない場合は、直前のタグの親を辿ってインデントが少ない物を探す
+                        def tmpParentTag = lastTag.getParent()
+                        while(true){
+                            if (indentCount > tmpParentTag.getIndentCount()) {
+                                tag.setParent(tmpParentTag)
+                                tmpParentTag.getChildren().add(tag)
                                 break
-                            } else {
-                                t = t2.children.get(t2.children.size() - 1)
                             }
+                            tmpParentTag = tmpParentTag.getParent()
                         }
                     }
-//                    while (true) {
-//                        List<Tag> children = tags.get(tags.size() - 1).children
-//                        if (indentCount - 1 == children.get(0).indentCount) {
-//                            children.add(tag)
-//                            break
-//                        }
-//                    }
-
-//                    tags.get(tags.size() - 1).getChildren().add(tag)
                 } else {
                     tags.add(tag)
                 }
-                lastIndentCount = indentCount
+                lastTag = tag
                 return
             }
 
@@ -79,40 +67,30 @@ class Tmp {
             }
 
             // インデントが直前より多かったら子要素 または 直前の要素が子要素でそれと同じインデントだったらこちらも子要素
-            if (indentCount > lastIndentCount) {
+            if (lastTag != null) {
 //                if (indentCount > lastIndentCount || (tmpIndentCount == lastIndentCount)) {
-
-                def lastRootTag = tags.get(tags.size() - 1)
-                if (indentCount - 1 == lastRootTag.indentCount) {
-                    lastRootTag.children.add(tag)
+                if (indentCount == lastTag.getIndentCount()) {
+                    tag.setParent(lastTag.getParent())
+                    lastTag.getParent().getChildren().add(tag)
+                } else if (indentCount > lastTag.getIndentCount()){
+                    tag.setParent(lastTag)
+                    lastTag.getChildren().add(tag)
                 } else {
-                    def t = lastRootTag
-                    while (true) {
-                        def t2 = t.children.get(t.children.size() - 1)
-
-                        if (indentCount - 1 == t2.indentCount) {
-                            t2.children.add(tag)
+                    // 直前のタグよりインデントが少ない場合は、直前のタグの親を辿ってインデントが少ない物を探す
+                    def tmpParentTag = lastTag.getParent()
+                    while(true){
+                        if (indentCount > tmpParentTag.getIndentCount()) {
+                            tag.setParent(tmpParentTag)
+                            tmpParentTag.getChildren().add(tag)
                             break
-                        } else {
-                            t = t2.children.get(t2.children.size() - 1)
                         }
+                        tmpParentTag = tmpParentTag.getParent()
                     }
                 }
-//                    while (true) {
-//                        List<Tag> children = tags.get(tags.size() - 1).children
-//                        if (indentCount - 1 == children.get(0).indentCount) {
-//                            children.add(tag)
-//                            break
-//                        }
-//                    }
-
-//                    tags.get(tags.size() - 1).getChildren().add(tag)
             } else {
                 tags.add(tag)
             }
-
-            lastIndentCount = indentCount
-
+            lastTag = tag
 
         }
         show(tags)
