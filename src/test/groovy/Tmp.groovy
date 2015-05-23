@@ -15,13 +15,10 @@ class Tmp {
 
         List<Tag> tags = new ArrayList<Tag>()
         Tag lastTag
-//        def lastIndentCount = 0
 
         input.eachLine {
-//            println it
             def matcher = (it =~ /(\t*)(.+)/)
             def indentCount = matcher[0][1].count('\t')
-//            println indentCount
             def tag = new Tag()
             tag.indentCount = indentCount
 
@@ -61,14 +58,12 @@ class Tmp {
             def attributes = elements[1].split()
 
             attributes.each {
-//                println it
                 def keyAndValue = it.split(/:/, 2)
                 tag.attributes.put(keyAndValue[0], keyAndValue[1])
             }
 
             // インデントが直前より多かったら子要素 または 直前の要素が子要素でそれと同じインデントだったらこちらも子要素
             if (lastTag != null) {
-//                if (indentCount > lastIndentCount || (tmpIndentCount == lastIndentCount)) {
                 if (indentCount == lastTag.getIndentCount()) {
                     tag.setParent(lastTag.getParent())
                     lastTag.getParent().getChildren().add(tag)
@@ -97,7 +92,6 @@ class Tmp {
     }
 
     def void show(List<Tag> tags) {
-//        println tags
         tags.each {
             print '\t' * it.indentCount
             showTag(it)
