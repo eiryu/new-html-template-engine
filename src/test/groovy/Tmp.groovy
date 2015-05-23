@@ -37,28 +37,7 @@ class Tmp {
 
             // 属性を持たない場合
             if (elements.size() == 1) {
-                if (lastTag == null) {
-                    tags.add(tag)
-                } else {
-                    if (indentCount == lastTag.getIndentCount()) {
-                        tag.setParent(lastTag.getParent())
-                        lastTag.getParent().getChildren().add(tag)
-                    } else if (indentCount > lastTag.getIndentCount()){
-                        tag.setParent(lastTag)
-                        lastTag.getChildren().add(tag)
-                    } else {
-                        // 直前のタグよりインデントが少ない場合は、直前のタグの親を辿ってインデントが少ない物を探す
-                        def tmpParentTag = lastTag.getParent()
-                        while(true){
-                            if (indentCount > tmpParentTag.getIndentCount()) {
-                                tag.setParent(tmpParentTag)
-                                tmpParentTag.getChildren().add(tag)
-                                break
-                            }
-                            tmpParentTag = tmpParentTag.getParent()
-                        }
-                    }
-                }
+                analyzeTagStructure(tags, tag, lastTag)
                 lastTag = tag
                 return
             }
@@ -70,32 +49,42 @@ class Tmp {
                 tag.attributes.put(keyAndValue[0], keyAndValue[1])
             }
 
-            if (lastTag == null) {
-                tags.add(tag)
-            } else {
-                if (indentCount == lastTag.getIndentCount()) {
-                    tag.setParent(lastTag.getParent())
-                    lastTag.getParent().getChildren().add(tag)
-                } else if (indentCount > lastTag.getIndentCount()){
-                    tag.setParent(lastTag)
-                    lastTag.getChildren().add(tag)
-                } else {
-                    // 直前のタグよりインデントが少ない場合は、直前のタグの親を辿ってインデントが少ない物を探す
-                    def tmpParentTag = lastTag.getParent()
-                    while(true){
-                        if (indentCount > tmpParentTag.getIndentCount()) {
-                            tag.setParent(tmpParentTag)
-                            tmpParentTag.getChildren().add(tag)
-                            break
-                        }
-                        tmpParentTag = tmpParentTag.getParent()
-                    }
-                }
-            }
+            analyzeTagStructure(tags, tag, lastTag)
             lastTag = tag
-
         }
         show(tags)
+    }
+
+    def void analyzeTagStructure(List<Tag> tags, Tag tag, Tag lastTag) {
+        if (lastTag == null) {
+            tags.add(tag)
+        } else {
+            int indentCount = tag.getIndentCount()
+            int lastIndentCount = lastTag.getIndentCount()
+
+            // 直前のタグとインデントが同じ場合は、同じ親タグを持つ
+            if (indentCount == lastIndentCount) {
+                tag.setParent(lastTag.getParent())
+                lastTag.getParent().getChildren().add(tag)
+
+                // 直前のタグよりインデントが多い場合は、直前のタグの子
+            } else if (indentCount > lastIndentCount){
+                tag.setParent(lastTag)
+                lastTag.getChildren().add(tag)
+
+                // 直前のタグよりインデントが少ない場合は、直前のタグの親を辿ってインデントが少ない物を探してその子タグとする
+            } else {
+                def tmpParentTag = lastTag.getParent()
+                while(true){
+                    if (indentCount > tmpParentTag.getIndentCount()) {
+                        tag.setParent(tmpParentTag)
+                        tmpParentTag.getChildren().add(tag)
+                        break
+                    }
+                    tmpParentTag = tmpParentTag.getParent()
+                }
+            }
+        }
     }
 
     def void show(List<Tag> tags) {
