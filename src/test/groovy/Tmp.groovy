@@ -14,22 +14,32 @@ class Tmp {
         def input = new File('src/test/resources/input.txt')
 
         List<Tag> tags = new ArrayList<Tag>()
+
+        // 直前のタグ
         Tag lastTag
 
         input.eachLine {
             def matcher = (it =~ /(\t*)(.+)/)
+
+            // インデント数取得
             def indentCount = matcher[0][1].count('\t')
             def tag = new Tag()
             tag.indentCount = indentCount
 
-            // 最初の空白で分割
+            // 最初の空白でタグ名と属性を分割
+            //
+            // 例）
+            // input type:text name:foo value:bar
+            // elements[0]: input
+            // elements[1]: type:text name:foo value:bar
             def elements = matcher[0][2].split(/ /, 2)
             tag.name = elements[0]
 
             // 属性を持たない場合
             if (elements.size() == 1) {
-                // インデントが直前より多かったら子要素 または 直前の要素が子要素でそれと同じインデントだったらこちらも子要素
-                if (lastTag != null) {
+                if (lastTag == null) {
+                    tags.add(tag)
+                } else {
                     if (indentCount == lastTag.getIndentCount()) {
                         tag.setParent(lastTag.getParent())
                         lastTag.getParent().getChildren().add(tag)
@@ -48,8 +58,6 @@ class Tmp {
                             tmpParentTag = tmpParentTag.getParent()
                         }
                     }
-                } else {
-                    tags.add(tag)
                 }
                 lastTag = tag
                 return
@@ -62,8 +70,9 @@ class Tmp {
                 tag.attributes.put(keyAndValue[0], keyAndValue[1])
             }
 
-            // インデントが直前より多かったら子要素 または 直前の要素が子要素でそれと同じインデントだったらこちらも子要素
-            if (lastTag != null) {
+            if (lastTag == null) {
+                tags.add(tag)
+            } else {
                 if (indentCount == lastTag.getIndentCount()) {
                     tag.setParent(lastTag.getParent())
                     lastTag.getParent().getChildren().add(tag)
@@ -82,8 +91,6 @@ class Tmp {
                         tmpParentTag = tmpParentTag.getParent()
                     }
                 }
-            } else {
-                tags.add(tag)
             }
             lastTag = tag
 
