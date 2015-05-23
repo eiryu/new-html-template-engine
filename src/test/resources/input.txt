@@ -5,3 +5,5 @@ html
 	body
 		h1 :hello
 		input type:text name:foo value:bar
+		div
+			p

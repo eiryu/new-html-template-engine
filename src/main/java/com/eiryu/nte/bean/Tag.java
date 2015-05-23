@@ -15,6 +15,7 @@ public class Tag {
     private int indentCount;
     private Map<String, String> attributes;
     private List<Tag> children;
+    private Tag parent;
 
     public Tag() {
         attributes = new LinkedHashMap<>();
@@ -54,6 +55,14 @@ public class Tag {
         this.children = children;
     }
 
+    public Tag getParent() {
+        return parent;
+    }
+
+    public void setParent(Tag parent) {
+        this.parent = parent;
+    }
+
     @Override
     public String toString() {
         return "Tag{" +
@@ -61,6 +70,7 @@ public class Tag {
                 ", indentCount=" + indentCount +
                 ", attributes=" + attributes +
                 ", children=" + children +
+                ", parent=" + parent +
                 '}';
     }
 }

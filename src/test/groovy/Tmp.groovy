@@ -14,112 +14,80 @@ class Tmp {
         def input = new File('src/test/resources/input.txt')
 
         List<Tag> tags = new ArrayList<Tag>()
-        def lastIndentCount = 0
+
+        // 直前のタグ
+        Tag lastTag
 
         input.eachLine {
-//            println it
             def matcher = (it =~ /(\t*)(.+)/)
+
+            // インデント数取得
             def indentCount = matcher[0][1].count('\t')
-//            println indentCount
             def tag = new Tag()
             tag.indentCount = indentCount
 
-            // 最初の空白で分割
+            // 最初の空白でタグ名と属性を分割
+            //
+            // 例）
+            // input type:text name:foo value:bar
+            // elements[0]: input
+            // elements[1]: type:text name:foo value:bar
             def elements = matcher[0][2].split(/ /, 2)
             tag.name = elements[0]
 
-            if (tags.size() > 0) {
-                lastIndentCount = tags.get(tags.size() - 1).indentCount
-            }
-
             // 属性を持たない場合
             if (elements.size() == 1) {
-                // インデントが直前より多かったら子要素 または 直前の要素が子要素でそれと同じインデントだったらこちらも子要素
-                if (indentCount > lastIndentCount) {
-//                if (indentCount > lastIndentCount || (tmpIndentCount == lastIndentCount)) {
-
-                    def lastRootTag = tags.get(tags.size() - 1)
-                    if (indentCount - 1 == lastRootTag.indentCount) {
-                        lastRootTag.children.add(tag)
-                    } else {
-                        def t = lastRootTag
-                        while (true) {
-                            def t2 = t.children.get(t.children.size() - 1)
-
-                            if (indentCount - 1 == t2.indentCount) {
-                                t2.children.add(tag)
-                                break
-                            } else {
-                                t = t2.children.get(t2.children.size() - 1)
-                            }
-                        }
-                    }
-//                    while (true) {
-//                        List<Tag> children = tags.get(tags.size() - 1).children
-//                        if (indentCount - 1 == children.get(0).indentCount) {
-//                            children.add(tag)
-//                            break
-//                        }
-//                    }
-
-//                    tags.get(tags.size() - 1).getChildren().add(tag)
-                } else {
-                    tags.add(tag)
-                }
-                lastIndentCount = indentCount
+                analyzeTagStructure(tags, tag, lastTag)
+                lastTag = tag
                 return
             }
 
             def attributes = elements[1].split()
 
             attributes.each {
-//                println it
                 def keyAndValue = it.split(/:/, 2)
                 tag.attributes.put(keyAndValue[0], keyAndValue[1])
             }
 
-            // インデントが直前より多かったら子要素 または 直前の要素が子要素でそれと同じインデントだったらこちらも子要素
-            if (indentCount > lastIndentCount) {
-//                if (indentCount > lastIndentCount || (tmpIndentCount == lastIndentCount)) {
-
-                def lastRootTag = tags.get(tags.size() - 1)
-                if (indentCount - 1 == lastRootTag.indentCount) {
-                    lastRootTag.children.add(tag)
-                } else {
-                    def t = lastRootTag
-                    while (true) {
-                        def t2 = t.children.get(t.children.size() - 1)
-
-                        if (indentCount - 1 == t2.indentCount) {
-                            t2.children.add(tag)
-                            break
-                        } else {
-                            t = t2.children.get(t2.children.size() - 1)
-                        }
-                    }
-                }
-//                    while (true) {
-//                        List<Tag> children = tags.get(tags.size() - 1).children
-//                        if (indentCount - 1 == children.get(0).indentCount) {
-//                            children.add(tag)
-//                            break
-//                        }
-//                    }
-
-//                    tags.get(tags.size() - 1).getChildren().add(tag)
-            } else {
-                tags.add(tag)
-            }
-
-            lastIndentCount = indentCount
-
-
+            analyzeTagStructure(tags, tag, lastTag)
+            lastTag = tag
         }
         show(tags)
     }
 
+    def void analyzeTagStructure(List<Tag> tags, Tag tag, Tag lastTag) {
+        if (lastTag == null) {
+            tags.add(tag)
+        } else {
+            int indentCount = tag.getIndentCount()
+            int lastIndentCount = lastTag.getIndentCount()
+
+            // 直前のタグとインデントが同じ場合は、同じ親タグを持つ
+            if (indentCount == lastIndentCount) {
+                tag.setParent(lastTag.getParent())
+                lastTag.getParent().getChildren().add(tag)
+
+                // 直前のタグよりインデントが多い場合は、直前のタグの子
+            } else if (indentCount > lastIndentCount) {
+                tag.setParent(lastTag)
+                lastTag.getChildren().add(tag)
+
+                // 直前のタグよりインデントが少ない場合は、直前のタグの親を辿ってインデントが少ない物を探してその子タグとする
+            } else {
+                def tmpParentTag = lastTag.getParent()
+                while (true) {
+                    if (indentCount > tmpParentTag.getIndentCount()) {
+                        tag.setParent(tmpParentTag)
+                        tmpParentTag.getChildren().add(tag)
+                        break
+                    }
+                    tmpParentTag = tmpParentTag.getParent()
+                }
+            }
+        }
+    }
+
     def void show(List<Tag> tags) {
-//        println tags
         tags.each {
             print '\t' * it.indentCount
             showTag(it)
