@@ -20,7 +20,7 @@ HTMLを楽に書くためのもの。nodeのJadeが似てる。
 html
 	head
 		meta charset:utf8
-		title :'sample page'
+		title :'hello world'
 	body
 		h1 :hello
 ```
