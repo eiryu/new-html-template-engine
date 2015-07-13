@@ -76,7 +76,11 @@ class Tmp {
             } else {
                 def tmpParentTag = lastTag.getParent()
                 while (true) {
-                    if (indentCount > tmpParentTag.getIndentCount()) {
+                    // 親タグを持たなかった場合
+                    if (tmpParentTag == null) {
+                        tags.add(tag)
+                        break
+                    } else if (indentCount > tmpParentTag.getIndentCount()) {
                         tag.setParent(tmpParentTag)
                         tmpParentTag.getChildren().add(tag)
                         break
