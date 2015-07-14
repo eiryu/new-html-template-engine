@@ -1,17 +1,21 @@
+package com.eiryu.nte
+
 import com.eiryu.nte.bean.Tag
-import org.junit.Test
 
 /**
- * Created by eiryu on 2015/05/02.
+ * Created by eiryu on 2015/07/14.
  */
-class Tmp {
+class NewTemplateEngine {
 
-//    private static final String INDENT_CHAR = '\t'
+    static void process(File file) {
+        processInner(file)
+    }
 
-    @Test
-    void 仮実装をGroovyで書いてみる() {
+    static void process(String string) {
+        processInner(string)
+    }
 
-        def input = new File('src/test/resources/input.txt')
+    private static void processInner(def input) {
 
         List<Tag> tags = new ArrayList<Tag>()
 
@@ -55,7 +59,7 @@ class Tmp {
         show(tags)
     }
 
-    def void analyzeTagStructure(List<Tag> tags, Tag tag, Tag lastTag) {
+    private static void analyzeTagStructure(List<Tag> tags, Tag tag, Tag lastTag) {
         if (lastTag == null) {
             tags.add(tag)
         } else {
@@ -91,7 +95,7 @@ class Tmp {
         }
     }
 
-    def void show(List<Tag> tags) {
+    private static void show(List<Tag> tags) {
         tags.each {
             print '\t' * it.indentCount
             showTag(it)
@@ -104,7 +108,7 @@ class Tmp {
         }
     }
 
-    def showTag(Tag tag) {
+    private static void showTag(Tag tag) {
         def a = ''
         tag.attributes.each {
             if ('' == it.key) {
