@@ -1,11 +1,11 @@
-package com.eiryu.nte
+package com.eiryu.templa
 
-import com.eiryu.nte.bean.Tag
+import com.eiryu.templa.bean.Tag
 
 /**
  * Created by eiryu on 2015/07/14.
  */
-class NewTemplateEngine {
+class Templa {
 
     static void process(File file) {
         processInner(file)

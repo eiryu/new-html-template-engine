@@ -1,4 +1,4 @@
-package com.eiryu.nte;
+package com.eiryu.templa;
 
 import org.junit.Test;
 
@@ -7,11 +7,11 @@ import java.io.File;
 /**
  * Created by eiryu on 2015/07/14.
  */
-public class NewTemplateEngineTest {
+public class TemplaTest {
 
     @Test
     public void ファイルから入力() {
-        NewTemplateEngine.process(new File("src/test/resources/input.txt"));
+        Templa.process(new File("src/test/resources/input.txt"));
     }
 
     @Test
@@ -24,6 +24,6 @@ public class NewTemplateEngineTest {
                         "\tdiv\n" +
                         "\t\tp";
 
-        NewTemplateEngine.process(input);
+        Templa.process(input);
     }
 }

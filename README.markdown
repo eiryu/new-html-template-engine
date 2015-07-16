@@ -1,4 +1,4 @@
-New HTML Template Engine（仮）
+Templa
 ============================
 
 # 作る理由
