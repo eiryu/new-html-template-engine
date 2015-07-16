@@ -38,3 +38,7 @@ html
 	</body>
 </html>
 ```
+
+# LICENSE
+
+MIT

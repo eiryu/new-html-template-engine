@@ -1,9 +1,12 @@
 apply plugin: 'groovy'
 apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 
+description = 'A New HTML Template Engine'
 group = 'com.eiryu'
-version = '0.1.0'
+version = '0.1.0-SNAPSHOT'
 archivesBaseName = 'templa'
 
 sourceCompatibility = '1.8'
@@ -44,4 +47,52 @@ artifacts {
     archives jar
     archives javadocJar
     archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Templa'
+                packaging 'jar'
+                description project.description
+                url 'https://github.com/eiryu/templa'
+
+                scm {
+                    connection 'scm:git:https://github.com/eiryu/templa.git'
+                    developerConnection 'scm:git:https://github.com/eiryu/templa.git'
+                    url 'https://github.com/eiryu/templa.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'http://opensource.org/licenses/MIT'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'eiryu'
+                        name 'Hidetaka Koda'
+                        email 'eiryu.co@gmail.com'
+                    }
+                }
+            }
+        }
+    }
 }
