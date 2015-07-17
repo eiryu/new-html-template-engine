@@ -6,7 +6,7 @@ apply plugin: 'signing'
 
 description = 'A New HTML Template Engine'
 group = 'com.eiryu'
-version = '0.1.0-SNAPSHOT'
+version = '0.1.0'
 archivesBaseName = 'templa'
 
 sourceCompatibility = '1.8'
