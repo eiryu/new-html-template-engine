@@ -1,6 +1,8 @@
 Templa
 ============================
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.eiryu/templa/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.eiryu/templa)
+
 # 作る理由
 
 HTMLを楽に書くためのもの。nodeのJadeが似てる。
